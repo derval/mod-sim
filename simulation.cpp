@@ -26,22 +26,25 @@ int main(int argc, char * argv[])
 { 
 
   // Welcome message
-  cerr << "\n== SIMULATION PROJECT - CMI 2011-2012 ==\n" << endl;
+  cerr << "\n========================================" << endl
+       << "== SIMULATION PROJECT - CMI 2011-2012 ==" << endl
+       << "========================================\n" << endl;
+
 
   // Number of events
   int nEvents = 100;
   if (argc == 2) 
     nEvents = atoi(*++argv);
 
-  // Random Generator initialization
-  gsl_rng * rand_gen = initialize_rand();
+  // Random Number Generator initialization
+  gsl_rng * rng = initialize_rand();
 
   // Display configuration of the simulation
   cerr << "--- Number of Events : " << nEvents << endl;
+  cerr << endl;
 
-
-  // Create the experiment
-  Experiment * experiment = new Experiment(rand_gen);
+  // Create the experiment (energy in eV)
+  Experiment * experiment = new Experiment(rng,1000000);
 
   
   // Proceed to a given number of events
@@ -49,13 +52,11 @@ int main(int argc, char * argv[])
   for (i=1;i <= nEvents;i++){
     experiment->event(i,nEvents);
   }
-
-  experiment->showStack();
-
+  
 
   // Cleaning
   delete(experiment);
-  gsl_rng_free (rand_gen);
+  gsl_rng_free (rng);
 
   return 0;
 }

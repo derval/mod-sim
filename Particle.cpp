@@ -5,18 +5,22 @@ using namespace std;
 
 #include "Particle.h"
 
-
 /* PARTICLE CLASS IMPLEMENTATION */
 
-void Particle::propagation()
-{}
+double Particle::propagation(double lambda)
+{
+  double L = 0;
+  double exp_probability = exp_rand(1, rng_);
+  cout << "Jean Paul : " << exp_probability << endl;
+  return L;
+}
 
 void Particle::interaction()
 {}
 
 // constructor and destructor
 
-Particle::Particle(int type): type_(type)
+Particle::Particle(gsl_rng * rng, int type, double energy): rng_(rng), type_(type), energy_(energy)
 {}
 
 Particle::~Particle()

@@ -29,7 +29,17 @@ void Experiment::event(int nEvent, int nEvents)
   */
 
   Particle * current = source_ -> emitParticle();
+    
   add2stack(current);
+
+  while (firstInStack_ != 0)
+    {
+      cerr << "Taking care of particle " << current << endl;
+      this -> removeFirstInStack();
+      current -> propagation(1);
+      delete current;
+    }
+  
 }
 
 void Experiment::add2stack(Particle * particle)
@@ -41,16 +51,37 @@ void Experiment::add2stack(Particle * particle)
   firstInStack_ = particle;
 }
 
+void Experiment::removeFirstInStack()
+{
+  if(firstInStack_ != 0)
+    {
+      Particle * currentFirst = firstInStack_;
+      
+      if(currentFirst -> getNext() != 0)
+	{
+	  firstInStack_ = currentFirst -> getNext();
+	  firstInStack_ -> setPrev(0);
+	}
+      else
+	{
+	  firstInStack_ = 0;
+	}
+    }
+  else
+    cerr << "-- ERROR -- Attempted to remove a particule from an empty stack !" << endl;
+}
+
 // constructor and destructor
 
-Experiment::Experiment(gsl_rng * rand_gen):rand_gen_(rand_gen), firstInStack_(0)
+Experiment::Experiment(gsl_rng * rng, double sourceEnergy):rng_(rng), firstInStack_(0)
 {
-  source_ = new Source();
+  source_ = new Source(rng_,sourceEnergy);
 }
 
 
 Experiment::~Experiment()
 {
+  delete source_;
 }
 
 // getters
@@ -67,13 +98,20 @@ void Experiment::setFirstInStack(Particle * particle)
 
 void Experiment::showStack()
 {
-  cerr << endl << "-- PARTICLE STACK : --" << endl;
-  Particle * current = firstInStack_;
-  do
+  cerr << "-- PARTICLE STACK : " << endl;
+  
+  if(firstInStack_ != 0)
     {
-      cout << "particule !" << endl;
-      current = current -> getNext();
-    }  while(current != 0);
+      Particle * current = firstInStack_;
+      do
+	{
+	  cerr << current << endl;
+	  current = current -> getNext();
+	}  while(current != 0);
+    }
+  else
+    cerr << "-- The particle stack is empty." << endl;
+  cerr << "-- END OF STACK \n" << endl;
 }
 
 // operators

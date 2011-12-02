@@ -29,9 +29,9 @@ double uniform_rand(double lower, double upper, gsl_rng * rand_gen)
   return random;
 }
 
-double exp_rand(double lambda, gsl_rng * rand_gen)
+double exp_rand(double param, gsl_rng * rand_gen)
 {
-  double random = -1 * 1 / lambda * gsl_sf_log(gsl_rng_uniform(rand_gen));
+  double random = -1 * 1/param * gsl_sf_log(gsl_rng_uniform(rand_gen));
   return random;
 }
 

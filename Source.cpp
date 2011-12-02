@@ -10,13 +10,13 @@ using namespace std;
 
 Particle * Source::emitParticle()
 {
-  Particle * newParticle = new Particle(1);
+  Particle * newParticle = new Particle(rng_,0,sourceEnergy_);
   return newParticle;
 }
 
 // constructor and destructor
 
-Source::Source()
+Source::Source(gsl_rng * rng, double sourceEnergy): rng_(rng), sourceEnergy_(sourceEnergy)
 {
 }
 

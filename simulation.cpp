@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
   // Number of events
   int nEvents = 100;
   if (argc == 2) 
-    nEvents = atoi(*++argv);
+    nEvents = atoi(argv[1]);
 
   // Random Number Generator initialization
   gsl_rng * rng = initialize_rand();

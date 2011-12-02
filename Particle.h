@@ -35,9 +35,7 @@ class Particle
   double theta_, phi_; 
 
   // Previous and next particle in the stack
-  Particle * next_; 
-  Particle * prev_;
-  
+  Particle * next_;   
   
  protected:
   
@@ -57,12 +55,10 @@ class Particle
   double getY(){return position_[1];};
   double getZ(){return position_[2];};
   Particle * getNext(){return next_;};
-  Particle * getPrev(){return prev_;};
  
   // setters
 
   void setNext(Particle * next);
-  void setPrev(Particle * prev);
 
   // display
 

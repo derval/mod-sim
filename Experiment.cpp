@@ -28,14 +28,13 @@ void Experiment::event(int nEvent, int nEvents)
     cout << endl;
   */
 
-  Particle * current = source_ -> emitParticle();
+  add2stack(source_ -> emitParticle());
     
-  add2stack(current);
-
-  while (firstInStack_ != 0)
+  while (topOfStack_ != 0)
     {
+      Particle * current = topOfStack_;
       cerr << "Taking care of particle " << current << endl;
-      this -> removeFirstInStack();
+      removeTopOfStack();
       current -> propagation(1);
       delete current;
     }
@@ -44,28 +43,23 @@ void Experiment::event(int nEvent, int nEvents)
 
 void Experiment::add2stack(Particle * particle)
 {
-  particle -> setNext(firstInStack_);
-  particle -> setPrev(0);
-  if(firstInStack_ != 0)
-    firstInStack_ -> setPrev(particle);
-  firstInStack_ = particle;
+  particle -> setNext(topOfStack_);
+  topOfStack_ = particle;
 }
 
-void Experiment::removeFirstInStack()
+void Experiment::removeTopOfStack()
 {
-  if(firstInStack_ != 0)
+  if(topOfStack_ != 0)
     {
-      Particle * currentFirst = firstInStack_;
+      Particle * currentFirst = topOfStack_;
       
       if(currentFirst -> getNext() != 0)
 	{
-	  firstInStack_ = currentFirst -> getNext();
-	  firstInStack_ -> setPrev(0);
+	  topOfStack_ = currentFirst -> getNext();
+	  currentFirst -> setNext(0);
 	}
       else
-	{
-	  firstInStack_ = 0;
-	}
+	{topOfStack_ = 0;}
     }
   else
     cerr << "-- ERROR -- Attempted to remove a particule from an empty stack !" << endl;
@@ -73,7 +67,7 @@ void Experiment::removeFirstInStack()
 
 // constructor and destructor
 
-Experiment::Experiment(gsl_rng * rng, double sourceEnergy):rng_(rng), firstInStack_(0)
+Experiment::Experiment(gsl_rng * rng, double sourceEnergy):rng_(rng), topOfStack_(0)
 {
   source_ = new Source(rng_,sourceEnergy);
 }
@@ -88,9 +82,9 @@ Experiment::~Experiment()
 
 
 // setters
-void Experiment::setFirstInStack(Particle * particle)
+void Experiment::setTopOfStack(Particle * particle)
 {
-  firstInStack_ = particle;
+  topOfStack_ = particle;
 }
 
 
@@ -100,9 +94,9 @@ void Experiment::showStack()
 {
   cerr << "-- PARTICLE STACK : " << endl;
   
-  if(firstInStack_ != 0)
+  if(topOfStack_ != 0)
     {
-      Particle * current = firstInStack_;
+      Particle * current = topOfStack_;
       do
 	{
 	  cerr << current << endl;

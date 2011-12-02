@@ -26,7 +26,7 @@ class Experiment
   Source * source_;
 
   // 1st Particle in Stack
-  Particle * firstInStack_;
+  Particle * topOfStack_;
 
  protected:
   
@@ -35,17 +35,17 @@ class Experiment
 
   void event(int nEvent, int nEvents);
   void add2stack(Particle * particle);
-  void removeFirstInStack();
+  void removeTopOfStack();
 
   // constructor and destructor
   Experiment(gsl_rng * rng, double sourceEnergy);
   ~Experiment();
   
   // getters
-  Particle * getFirstInStack(){return firstInStack_;};
+  Particle * getTopOfStack(){return topOfStack_;};
 
   // setters
-  void setFirstInStack(Particle * particle);
+  void setTopOfStack(Particle * particle);
 
   // display
   void showStack();

@@ -16,7 +16,8 @@ double Particle::propagation(double lambda)
 }
 
 void Particle::interaction()
-{}
+{
+}
 
 // constructor and destructor
 
@@ -33,8 +34,6 @@ Particle::~Particle()
 void Particle::setNext(Particle * next)
 {next_ = next;};
 
-void Particle::setPrev(Particle * prev)
-{prev_ = prev;};
 
 
 // display

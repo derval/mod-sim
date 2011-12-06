@@ -18,16 +18,8 @@ using namespace std;
 
 void Experiment::event(int nEvent, int nEvents)
 {
-  /*
-  //cout << uniform_rand(0,1,rand_gen_);
-  //cout << exp_rand(1,rand_gen_);
-  cout << gaussian_rand(10,3,rand_gen_);
-  //cout << specific_rand(sin,0,100,10,rand_gen_);
   
-  if(nEvent != nEvents)
-    cout << endl;
-  */
-
+  // Source emits a particle that is added to the stack
   add2stack(source_ -> emitParticle());
     
   while (topOfStack_ != 0)

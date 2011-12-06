@@ -1,4 +1,4 @@
-SIMUL = simulation.o random.o $(EXPERIMENT)
+SIMUL = simulation.o random.o interaction_data.o $(EXPERIMENT)
 EXPERIMENT = Experiment.o Particle.o Source.o Detector.o Collimator.o Enclosure.o
 PROCESS = processing.o 
 CPPFLAGS = -I/usr/include/gsl
@@ -29,6 +29,6 @@ clean:
 
 
 %.o: %.cpp
-	$(C++) $(ROOT_INCLUDE) -c $*.cpp -o $*.o -Wall -Wshadow -O
+	$(C++) $(ROOT_INCLUDE) -c $*.cpp -o $*.o
 
 

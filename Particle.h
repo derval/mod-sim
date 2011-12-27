@@ -7,6 +7,7 @@
 using namespace std;
 
 #include "random.h"
+#include "interaction_data.h"
 
 /* PARTICLE CLASS DEFINITION */
 
@@ -18,11 +19,19 @@ using namespace std;
 #define SODIUM 4
 
 
-class Particle 
+typedef struct
+{
+  int nParticlesCreated;
+  void ** particlesCreated;
+  double depositedEnergy;
+} interactionResult;
+
+
+class Particle
 {
   
  private:
-  
+
   // Random Number Generator
   gsl_rng * rng_;
   // Particle Type
@@ -36,14 +45,18 @@ class Particle
 
   // Previous and next particle in the stack
   Particle * next_;   
+
+  // Private functions
+  int selectInteractionType(double *** data);
+
   
  protected:
   
   
  public:
   
-  double propagation(double lambda);
-  void interaction(void);
+  double Propagation(double lambda);
+  interactionResult Interaction(double *** data);
 
   // constructor and destructor
   Particle(gsl_rng * rng, int type, double energy);
@@ -55,7 +68,8 @@ class Particle
   double getY(){return position_[1];};
   double getZ(){return position_[2];};
   Particle * getNext(){return next_;};
- 
+  double getEnergy(){return energy_;};
+
   // setters
 
   void setNext(Particle * next);

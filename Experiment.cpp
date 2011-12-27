@@ -25,9 +25,10 @@ void Experiment::event(int nEvent, int nEvents)
   while (topOfStack_ != 0)
     {
       Particle * current = topOfStack_;
-      cerr << "Taking care of particle " << current << endl;
+      cerr << endl << "Taking care of particle " << current << endl;
       removeTopOfStack();
-      current -> propagation(1);
+      current -> Propagation(1);
+      interactionResult result = current -> Interaction(data);
       delete current;
     }
   
@@ -62,12 +63,38 @@ void Experiment::removeTopOfStack()
 Experiment::Experiment(gsl_rng * rng, double sourceEnergy):rng_(rng), topOfStack_(0)
 {
   source_ = new Source(rng_,sourceEnergy);
+
+  // Loading Interaction Data
+  int i,j = 0;
+  data = new double ** [2];
+  for(i = 0; i < 2; i++)
+    {
+      data[i] = new double * [nColumns];
+      for(j = 0; j < nColumns; j++)
+	data[i][j] = new double [nLines];
+    }
+  
+  initData(data);
 }
 
 
 Experiment::~Experiment()
 {
   delete source_;
+
+  // Deleting Interaction Data
+  int i,j = 0;
+  for(i = 0; i < 2; i++) {
+    for(j = 0; j < nColumns; j++) {
+      delete [] data[i][j];
+      data[i][j] = 0;
+    }
+    delete [] data[i];
+    data[i] = 0;
+  }
+  delete [] data;
+  data = 0;
+
 }
 
 // getters

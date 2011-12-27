@@ -11,16 +11,20 @@ using namespace std;
 
 #include "Source.h"
 #include "Particle.h"
+#include "interaction_data.h"
 
 
 /* EXPERIMENT CLASS DEFINITION */
 
-class Experiment 
+class Experiment
 {
 
  private:
   // Random Generator
   gsl_rng * rng_;
+
+  // Interaction data
+  double *** data;
   
   // Particule Source
   Source * source_;

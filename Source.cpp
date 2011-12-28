@@ -10,13 +10,14 @@ using namespace std;
 
 Particle * Source::emitParticle()
 {
-  Particle * newParticle = new Particle(rng_,0,sourceEnergy_);
+  double energy = gaussian_rand(sourceEnergy_,sourceSigma_,rng_);
+  Particle * newParticle = new Particle(rng_,energy);
   return newParticle;
 }
 
 // constructor and destructor
 
-Source::Source(gsl_rng * rng, double sourceEnergy): rng_(rng), sourceEnergy_(sourceEnergy)
+Source::Source(gsl_rng * rng, double sourceEnergy, double sourceSigma): rng_(rng), sourceEnergy_(sourceEnergy), sourceSigma_(sourceSigma)
 {
 }
 

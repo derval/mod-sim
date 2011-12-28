@@ -24,7 +24,7 @@ static const int nColumns = 5;
 int initData(double *** data);
 int loadData(double ** dataArray, string dataPath);
 
-// Electron Shells Energies (keV)6
+// Electron Shells Energies (keV)
 
 static const double I_Shells[] = {3.317E+01, 5.188E+00, 4.852E+00, 4.557E+00, 1.072E+00, 0};
 static const double Na_Shells[] = {1.072E+00, 0};

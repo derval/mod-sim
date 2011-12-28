@@ -16,6 +16,7 @@ class Source
  private:
   gsl_rng * rng_;
   double sourceEnergy_;
+  double sourceSigma_; // Standard deviation of the gaussian distribution of emitted particles energies
 
  protected:
   
@@ -25,7 +26,7 @@ class Source
   Particle * emitParticle();
 
   // constructor and destructor
-  Source(gsl_rng * rng, double sourceEnergy);
+  Source(gsl_rng * rng, double sourceEnergy, double sourceSigma);
   ~Source();
   
   // getters

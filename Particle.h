@@ -34,8 +34,6 @@ class Particle
 
   // Random Number Generator
   gsl_rng * rng_;
-  // Particle Type
-  int type_;
   // Energy
   double energy_;
   // Position
@@ -48,6 +46,7 @@ class Particle
 
   // Private functions
   int selectInteractionType(double *** data);
+  void PhotoElectric(int atom, interactionResult * result);
 
   
  protected:
@@ -56,14 +55,13 @@ class Particle
  public:
   
   double Propagation(double lambda);
-  interactionResult Interaction(double *** data);
+  interactionResult Interaction(double *** data);  
 
   // constructor and destructor
-  Particle(gsl_rng * rng, int type, double energy);
+  Particle(gsl_rng * rng, double energy);
   ~Particle();
   
   // getters
-  int getType(){return type_;};
   double getX(){return position_[0];};
   double getY(){return position_[1];};
   double getZ(){return position_[2];};

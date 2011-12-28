@@ -10,6 +10,7 @@
 using namespace std;
 
 #include "Source.h"
+#include "Detector.h"
 #include "Particle.h"
 #include "interaction_data.h"
 
@@ -28,6 +29,9 @@ class Experiment
   
   // Particule Source
   Source * source_;
+  
+  // Detector
+  Detector * detector_;
 
   // 1st Particle in Stack
   Particle * topOfStack_;
@@ -42,7 +46,7 @@ class Experiment
   void removeTopOfStack();
 
   // constructor and destructor
-  Experiment(gsl_rng * rng, double sourceEnergy);
+  Experiment(gsl_rng * rng, double sourceEnergy, double sourceSigma);
   ~Experiment();
   
   // getters

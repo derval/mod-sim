@@ -10,10 +10,66 @@ using namespace std;
 double Particle::Propagation(double lambda)
 {
   double L = 0;
-  double exp_probability = exp_rand(1, rng_);
-  cerr << "-- DEBUG -- Rand : " << exp_probability << endl;
+  //double exp_probability = exp_rand(1, rng_);
+  // cerr << "-- DEBUG -- Rand : " << exp_probability << endl;
   return L;
 }
+
+
+interactionResult Particle::Interaction(double*** data){
+  
+  interactionResult result;
+  result.nParticlesCreated = 0;
+  result.depositedEnergy = 0;
+  result.particlesCreated = NULL;
+    
+  int interactionType = selectInteractionType(data);
+  
+  switch (interactionType)
+    {
+    case 0:
+      {
+	cerr << "-- DEBUG -- Na Compton scattering"<< endl;
+	break;
+      }
+      
+    case 1:
+      {
+	cerr << "-- DEBUG -- Na Photoelectric effect"<< endl;
+	break;
+      }
+      
+    case 2:
+      {
+	cerr << "-- DEBUG -- Na Pair production"<< endl;	
+	break;
+      }
+      
+    case 3:
+      {
+	cerr << "-- DEBUG -- I Compton scattering"<< endl;
+	break;
+      }
+      
+    case 4:
+      {
+	PhotoElectric(1, &result);
+	break;
+      }
+    
+    case 5:
+      {
+	cerr << "-- DEBUG -- I Pair production"<< endl;	
+	break;
+      }
+      
+    default:
+      exit(EXIT_FAILURE);
+    }
+
+  return result;
+}
+
 
 
 int Particle::selectInteractionType(double *** data)
@@ -48,7 +104,7 @@ int Particle::selectInteractionType(double *** data)
 	cerr << "peI : " << peI/dataNorm <<endl;
 	cerr << "ppI : " << ppI/dataNorm <<endl;*/
 
-  cerr << "NRJ " << energy_ << endl;
+  cerr << "-- DEBUG -- Particle Energy : " << energy_ << endl;
   double x = uniform_rand(0,dataNorm,rng_);
   
   //cerr<<"x= "<<x<<endl;
@@ -78,98 +134,81 @@ int Particle::selectInteractionType(double *** data)
   return interactionType;
 }
 
-interactionResult Particle::Interaction(double*** data){
+void Particle::PhotoElectric(int atom, interactionResult * result)
+{
+  const double * Shells = 0;
+  string element("0");
   
-  interactionResult result;
-  int interactionType = selectInteractionType(data);
-    
-  switch (interactionType)
+  if (atom == 0){
+    Shells = Na_Shells;
+    element = "Sodium";
+  }
+  else if (atom == 1){
+    Shells = I_Shells;
+    element = "Iodine";
+  }
+  
+  cerr << "-- DEBUG -- Photoelectric effect (" << element << ")" << endl;
+  // Determination of the energy of the photoelectron
+  int i=-1;
+  double random;
+  double electronEnergy = 0;
+  while(electronEnergy == 0)
     {
-    case 0:
-      {
-	cerr << "-- DEBUG -- Na Compton scattering"<< endl;
-	break;
-      }
+      i++;
+      random = uniform_rand(0,1,rng_);
       
-    case 1:
-      {
-	cerr << "-- DEBUG -- Na Photoelectric effect"<< endl;
-	break;
-      }
-      
-    case 2:
-      {
-	cerr << "-- DEBUG -- Na Pair production"<< endl;	
-	break;
-      }
-      
-    case 3:
-      {
-	cerr << "-- DEBUG -- I Compton scattering"<< endl;
-	break;
-      }
-      
-    case 4:
-      {
-	cerr << "-- DEBUG -- I Photoelectric effect"<< endl;
-	
-	// Determination of the energy of the photoelectron
-	double electronEnergy = 0;
-	double random;
-	int i = 0;
-
-	while(electronEnergy == 0)
-	  {
-	    random = uniform_rand(0,1,rng_);
-
-	    if (I_Shells[i] == 0)
-	      electronEnergy = energy_;
-	    else if (energy_ > I_Shells[i] && random < 0.9)
-	      electronEnergy = energy_ - I_Shells[i];
-
-	    i++;
-	  }
-	
-	cout << electronEnergy << endl;
-
-	// Auger / Fluo
-	random = uniform_rand(0,1,rng_);
-	
-	if(random < I_Auger)
-	  {
-	    // AUGER
-	    cout << "Auger" << endl;
-	  }
-	else
-	  {
-	    // FLUO
-	    cout << "Fluo" << endl;
-	  }
-
-	break;
-      }
-    
-    case 5:
-      {
-	cerr << "-- DEBUG -- I Pair production"<< endl;	
-	break;
-      }
-      
-    default:
-      exit(EXIT_FAILURE);
+      if (Shells[i] == 0)
+	electronEnergy = energy_;
+      else if (energy_ > Shells[i] && random < 0.9)
+	electronEnergy = energy_ - Shells[i];
     }
 
-  result.nParticlesCreated = 1;
-  result.depositedEnergy = 35.97;
-  result.particlesCreated = new void * [result.nParticlesCreated];
-  result.particlesCreated[0] = new Particle(rng_,0,25);
+  result->depositedEnergy = electronEnergy;
 
-  return result;
+  // Auger / Fluo
+  random = uniform_rand(0,1,rng_);
+  
+  if(random < I_Auger)
+    {
+      // AUGER
+      cerr << "-- DEBUG -- Auger" << endl;
+      
+    }
+  
+  else
+    {
+      // FLUO
+      cerr << "-- DEBUG -- Fluo " ;
+      
+      // K alpha
+      if ( i == 0 ) {
+	cerr << " (K alpha) " << endl;
+	random = uniform_rand(0,1,rng_);
+	double hnuFluo;
+	if (random <= 0.5)
+	  hnuFluo = I_Shells[0] - I_Shells[2]; // K alpha 1
+	else
+	  hnuFluo = I_Shells[0] - I_Shells[3]; // K alpha 2
+	
+	result->nParticlesCreated = 1;
+	result->particlesCreated = new void * [result->nParticlesCreated];
+	result->particlesCreated[0] = new Particle(rng_,hnuFluo);
+      }
+      
+      // not K
+      else
+	cerr << endl << "Ignoring fluorescence process (layer with a vacancy =/= K)" << endl;
+      
+    }
+  
 }
+
+
 
 // constructor and destructor
 
-Particle::Particle(gsl_rng * rng, int type, double energy): rng_(rng), type_(type), energy_(energy)
+Particle::Particle(gsl_rng * rng, double energy): rng_(rng), energy_(energy)
 {}
 
 Particle::~Particle()

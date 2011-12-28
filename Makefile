@@ -1,5 +1,5 @@
 SIMUL = simulation.o random.o interaction_data.o $(EXPERIMENT)
-EXPERIMENT = Particle.o Experiment.o Source.o Detector.o Collimator.o Enclosure.o
+EXPERIMENT = Particle.o Detector.o Collimator.o Enclosure.o Source.o Experiment.o
 PROCESS = processing.o 
 CPPFLAGS = -I/usr/include/gsl
 LDFLAGS = -lgsl

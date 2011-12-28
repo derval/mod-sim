@@ -25,8 +25,9 @@ using namespace std;
 /* Main Program */
 int main(int argc, char * argv[])
 { 
-  // Default Source Energy
+  // Default Source Parameters
   double sourceEnergy = 49.5; // keV
+  double sourceSigma = 2; // keV
 
   // Welcome message
   cerr << "\n========================================" << endl
@@ -37,14 +38,12 @@ int main(int argc, char * argv[])
   // Number of events
   int nEvents = 1;
   
-  if (argc == 3)
-    {
+  if (argc == 3) {
       nEvents = atoi(argv[1]);
       sourceEnergy = atof(argv[2]);
     }
   
-  else if (argc != 1 && argc != 3)
-    {
+  else if (argc != 1 && argc != 3) {
       cerr << "-- ERROR -- Proper use is ./simulation OR ./simulation <number of events> <source energy (keV)>" << endl << endl;
       exit(EXIT_FAILURE);
     }
@@ -55,12 +54,13 @@ int main(int argc, char * argv[])
 
   // Display configuration of the simulation
   cerr << "-- CONFIG -- Source Energy : " << sourceEnergy << " keV" << endl;
+  cerr << "-- CONFIG -- Source Energy Standard Deviation : " <<
   cerr << "-- CONFIG -- Number of Events : " << nEvents << endl;
   cerr << endl;
 
 
   // Create the experiment (energy in keV)
-  Experiment * experiment = new Experiment(rng,sourceEnergy);
+  Experiment * experiment = new Experiment(rng,sourceEnergy,sourceSigma);
 
   cerr << endl;
 

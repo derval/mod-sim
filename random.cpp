@@ -43,21 +43,48 @@ double gaussian_rand(double mu, double sq_sigma, gsl_rng * rand_gen)
   return random;
 }
 
-double specific_rand(double (*distribution)(double x), double lower_dist, double upper_dist, 
-		     double max_distrib, gsl_rng * rand_gen)
+double arbitrary_rand(double (*distribution)(double x), double lower_dist, double upper_dist, double max_distrib, gsl_rng * rand_gen)
 {
-  short done = 0;
-
-  while(done == 0)
-    {
-      double uniform = gsl_rng_uniform(rand_gen);
-      double uniform_lu = uniform_rand(lower_dist, upper_dist, rand_gen);
-      if(1 / max_distrib * (*distribution)(uniform_lu) > uniform)
-	{
-	  done = 1;
-	  return uniform_lu;
-	}
-    }
-
-  return 0;
+  double u=0;
+  double v=0;
+  
+  if( (upper_dist-lower_dist) <= 0 ){
+    cerr << "-- ERROR -- Attempted to use a wrong distribution in arbitrary_law (min/max)!" << endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  if( max_distrib <= 0 ){
+    cerr << "-- ERROR -- Attempted to use a wrong distribution in arbitrary_law (max_distrib) !" << endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  do {
+    u=gsl_rng_uniform(rand_gen);
+    v=(upper_dist-lower_dist)*gsl_rng_uniform(rand_gen);
+  }while ( u > (*distribution)(v) / max_distrib );
+  return v;
 }
+
+double parametric_arbitrary_rand(double (*distribution)(double x, double p), double parameter, double lower_dist, double upper_dist, double max_distrib, gsl_rng * rand_gen)
+{
+  double u=0;
+  double v=0;
+  
+  if( (upper_dist-lower_dist) <= 0 ){
+    cerr << "-- ERROR -- Attempted to use a wrong distribution in arbitrary_law (min/max)!" << endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  if( max_distrib <= 0 ){
+    cerr << "-- ERROR -- Attempted to use a wrong distribution in arbitrary_law (max_distrib) !" << endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  do {
+    u=gsl_rng_uniform(rand_gen);
+    v=(upper_dist-lower_dist)*gsl_rng_uniform(rand_gen);
+  }while ( u > distribution(v,parameter) / max_distrib );
+  return v;
+}
+
+

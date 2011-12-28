@@ -24,7 +24,10 @@ double exp_rand(double param, gsl_rng * rand_gen);
 double gaussian_rand(double mu, double sq_sigma, gsl_rng * rand_gen);
 
 // Specific distribution according to distribution function DISTRIBUTION
-double specific_rand(double (*distribution)(double x), double lower_dist, double upper_dist, 
+double arbitrary_rand(double (*distribution)(double x), double lower_dist, double upper_dist, 
+		     double max_distrib, gsl_rng * rand_gen);
+
+double parametric_arbitrary_rand(double (*distribution)(double x, double p), double parameter, double lower_dist, double upper_dist, 
 		     double max_distrib, gsl_rng * rand_gen);
 
 

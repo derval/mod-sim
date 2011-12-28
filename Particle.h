@@ -26,6 +26,8 @@ typedef struct
   double depositedEnergy;
 } interactionResult;
 
+double compton_distrib(double x,double ksi);
+
 
 class Particle
 {
@@ -46,8 +48,8 @@ class Particle
 
   // Private functions
   int selectInteractionType(double *** data);
+  void Compton(interactionResult * result);
   void PhotoElectric(int atom, interactionResult * result);
-
   
  protected:
   

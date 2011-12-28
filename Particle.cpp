@@ -48,11 +48,13 @@ interactionResult Particle::Interaction(double*** data){
     case 3:
       {
 	cerr << "-- DEBUG -- I Compton scattering"<< endl;
+	Compton(&result);
 	break;
       }
       
     case 4:
       {
+	cerr << "-- DEBUG -- I Photoelectric effect"<< endl;
 	PhotoElectric(1, &result);
 	break;
       }
@@ -134,21 +136,42 @@ int Particle::selectInteractionType(double *** data)
   return interactionType;
 }
 
+
+
+void Particle::Compton(interactionResult * result)
+{
+  double comptonEnergy=0;
+  double thetaCompton=0;
+  double ksi=energy_/511; // 511keV electron energy
+  thetaCompton=parametric_arbitrary_rand(compton_distrib,ksi,0,M_PI,1,rng_);
+  
+  comptonEnergy = energy_/(1+ksi*(1-cos(thetaCompton)));
+  
+  cerr<< "-- DEBUG -- ThetaCompton : " << thetaCompton << endl;
+  cout<< thetaCompton << endl;
+  
+  result->nParticlesCreated = 1;
+  result->depositedEnergy = energy_ - comptonEnergy;
+  result->particlesCreated = new void * [result->nParticlesCreated];
+  result->particlesCreated[0] = new Particle(rng_,comptonEnergy);
+}
+
+double compton_distrib(double x,double ksi){
+  // double r=2.81794092e-15;pow(r,2)*
+  return 1/pow(1+ksi*(1-cos(x)),2)*(1+pow(cos(x),2)+pow(ksi*(1-cos(x)),2)/(1+ksi*(1-cos(x))))/2;
+}
+
 void Particle::PhotoElectric(int atom, interactionResult * result)
 {
   const double * Shells = 0;
-  string element("0");
   
   if (atom == 0){
     Shells = Na_Shells;
-    element = "Sodium";
   }
   else if (atom == 1){
     Shells = I_Shells;
-    element = "Iodine";
   }
   
-  cerr << "-- DEBUG -- Photoelectric effect (" << element << ")" << endl;
   // Determination of the energy of the photoelectron
   int i=-1;
   double random;

@@ -30,5 +30,8 @@ double arbitrary_rand(double (*distribution)(double x), double lower_dist, doubl
 double parametric_arbitrary_rand(double (*distribution)(double x, double p), double parameter, double lower_dist, double upper_dist, 
 		     double max_distrib, gsl_rng * rand_gen);
 
+// +1 or -1 random creator
+double sign_rand(gsl_rng * rand_gen);
+
 
 #endif

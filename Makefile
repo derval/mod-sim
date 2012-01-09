@@ -1,6 +1,8 @@
-SIMUL = simulation.o random.o interaction_data.o $(EXPERIMENT)
-EXPERIMENT = Particle.o Detector.o Collimator.o Enclosure.o Source.o Experiment.o
-PROCESS = processing.o 
+EXPERIMENT = Detector.o Collimator.o Enclosure.o Particle.o Source.o Experiment.o
+SIMUL = simulation.o random.o interaction_data.o histo_maker.o file_maker.o $(EXPERIMENT)
+SIMUL_LIB = $(patsubst %,$(LIB)/%,$(SIMUL))
+PROCESS = processing.o
+PROCESS_LIB = $(patsubst %,$(LIB)/%,$(PROCESS))
 CPPFLAGS = -I/usr/include/gsl
 LDFLAGS = -lgsl
 ROOTFLAGS = $(ROOT_INCLUDE) $(ROOT_LIB)
@@ -11,24 +13,26 @@ ROOT_LIB = -L$(ROOTSYS)/lib -lCore -lCint \
          -lGpad -lGui -lGX11 -lRint 
 C++ = c++ -Wall -O -Wshadow
 
+LIB = lib
+SRC = src
 
 all: simulation processing
 
-simulation: $(SIMUL)
-	$(C++) -o simulation $(SIMUL) $(CPPFLAGS) $(LDFLAGS) -lpthread
+simulation: $(SIMUL_LIB)
+	$(C++) -o simulation $(SIMUL_LIB) $(CPPFLAGS) $(LDFLAGS) -lpthread
 
-processing: $(PROCESS)
-	$(C++) -o processing $(PROCESS) $(CPPFLAGS) $(LDFLAGS) $(ROOTFLAGS) -lpthread
+processing: $(PROCESS_LIB)
+	$(C++) -o processing $(PROCESS_LIB) $(CPPFLAGS) $(LDFLAGS) $(ROOTFLAGS) -lpthread
 
 clean:
-	rm -f *.o
+	rm -f $(LIB)/*.o
 
 -include $(SIMUL:.o=.d)
 -include $(EXPERIMENT:.o=.d)
 -include $(PROCESS:.o=.d)
 
+$(LIB)/%.o: $(SRC)/%.cpp
+	$(C++) $(ROOT_INCLUDE) -c $(SRC)/$*.cpp -o $(LIB)/$*.o
 
-%.o: %.cpp
-	$(C++) $(ROOT_INCLUDE) -c $*.cpp -o $*.o
 
 

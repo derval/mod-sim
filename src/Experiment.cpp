@@ -16,15 +16,12 @@ using namespace std;
 
 /* EXPERIMENT CLASS IMPLEMENTATION */
 
-void Experiment::event(int nEvent, int nEvents)
+double Experiment::event()
 {
   cerr << "-- INFO -- New Event" << endl;
   
-  int i = 0;  
   double scintillationEnergy = 0;
-  
-  // Source emits a particle that is added to the stack
-  add2stack(source_ -> emitParticle());
+  add2stack(source_ -> emitParticle()); // Source emits a particle that is added to the stack
   
   // Processing the stack
   while (topOfStack_ != 0)
@@ -32,20 +29,26 @@ void Experiment::event(int nEvent, int nEvents)
       Particle * current = topOfStack_;
       cerr << "Taking care of particle " << current << endl;
       removeTopOfStack();
-      current -> Propagation(1); // Particle moves...
-      interactionResult result = current -> Interaction(data); // then interacts.
-      scintillationEnergy += result.depositedEnergy;
-
+      
+      if (current->Propagation(collimator_,detector_,data) == 1) {
+	interactionResult result = current->Interaction(data);
+	scintillationEnergy += result.depositedEnergy;
+	
+	// Adding to the stack the particles resulting from previous interaction
+	for (int i=0; i < result.nParticlesCreated; i++)
+	  add2stack((Particle*)result.particlesCreated[i]);
+      }
+      else {
+	cerr << "-- DEBUG -- The particle got out the experiment !" << endl;
+      }
+      
       delete current;
       current = 0;
-      
-      // Adding to the stack the particles resulting from previous interaction
-      for (i=0; i < result.nParticlesCreated; i++)
-	add2stack((Particle*)result.particlesCreated[i]);
     }
 
-  cout << detector_->photomultiplication(detector_->scintillation(scintillationEnergy)) << endl;
+  cerr << "-- DEBUG -- Scintillation energy : " << scintillationEnergy << endl;
   cerr << "-- DEBUG -- Collected charge : " << detector_->photomultiplication(detector_->scintillation(scintillationEnergy)) << endl << endl;
+  return scintillationEnergy;
 }
 
 void Experiment::add2stack(Particle * particle)
@@ -74,10 +77,11 @@ void Experiment::removeTopOfStack()
 
 // constructor and destructor
 
-Experiment::Experiment(gsl_rng * rng, double sourceEnergy, double sourceSigma):rng_(rng), topOfStack_(0)
+Experiment::Experiment(gsl_rng * rng, sourceParameters sParam, detectorParameters dParam, collimatorParameters cParam):rng_(rng), topOfStack_(0)
 {
-  source_ = new Source(rng_,sourceEnergy, sourceSigma);
-  detector_ = new Detector();
+  source_ = new Source(rng_,sParam);
+  collimator_ = new Collimator(cParam);
+  detector_ = new Detector(dParam);
   
   // Loading Interaction Data
   int i,j = 0;
@@ -96,6 +100,7 @@ Experiment::Experiment(gsl_rng * rng, double sourceEnergy, double sourceSigma):r
 Experiment::~Experiment()
 {
   delete source_;
+  delete collimator_;
   delete detector_;
 
   // Deleting Interaction Data

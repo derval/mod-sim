@@ -9,17 +9,27 @@ using namespace std;
 
 int initData(double *** data)
 {
-  if(loadData(data[0],"lib/Na_data.csv") == 0)
+  if(loadData(data[0],"data/Na_data.csv") == 0)
     cerr << "--- Sodium Data Loading : SUCCESS" << endl;
   else
     {cerr << "--- Sodium Data Loading : ERROR" << endl;
+      exit(EXIT_FAILURE);
       return -1;}
   
-  if(loadData(data[1],"lib/I_data.csv") == 0)
+  if(loadData(data[1],"data/I_data.csv") == 0)
     cerr << "--- Iodine Data Loading : SUCCESS" << endl;
   else
     {cerr << "--- Iodine Data Loading : ERROR" << endl;
+      exit(EXIT_FAILURE);
       return -1;}
+  
+  for(int i = 0; i < nLines; i++) {
+    data[0][4][i] = (Na_A*(data[0][1][i]+data[0][2][i]+data[0][3][i])+I_A*(data[1][1][i]+data[1][2][i]+data[1][3][i]))/(Na_A+I_A);
+    if (data[0][4][i] <= 0) {
+      cerr << "-- ERROR -- Problem during total cross section calculation" << endl;
+      exit(EXIT_FAILURE);
+    }
+  }
   
   return 0;
 }

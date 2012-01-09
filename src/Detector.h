@@ -7,6 +7,12 @@
 using namespace std;
 
 
+typedef struct {
+  double position[2];
+  double diameter;
+  double width;
+} detectorParameters;
+
 /* DETECTOR CLASS DEFINITION */
 
 class Detector 
@@ -22,6 +28,9 @@ class Detector
   static const double CE_ = 0.95; //CE ~  95%  (efficacité  de  collection  de  l’électron  de  conversion  par  la  première dynode
   static const double G_ = 10e5;
   static const double density_ = 3.67; //en kg/m3 ou g/cm3
+
+  double position_[2];
+  double diameter_, width_;
   
  protected:
   
@@ -30,12 +39,17 @@ class Detector
 
   double scintillation(double electronEnergy);
   double photomultiplication(double nPhotons);
+  int isIn(double x, double y);
 
   // constructor and destructor
-  Detector();
+  Detector(detectorParameters parameters);
   ~Detector();
   
   // getters
+  double getDensity() {return density_;};
+  double getX(){return position_[0];};
+  double getY(){return position_[1];};
+  double getDiameter() {return diameter_;};
 
   // setters
 

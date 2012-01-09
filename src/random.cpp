@@ -88,3 +88,12 @@ double parametric_arbitrary_rand(double (*distribution)(double x, double p), dou
 }
 
 
+double sign_rand(gsl_rng * rand_gen)
+{
+  double random;
+  if (uniform_rand(0,1,rand_gen) > 0.5)
+    random = 1;
+  else
+    random = -1;
+  return random;
+}

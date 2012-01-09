@@ -11,6 +11,7 @@ using namespace std;
 
 #include "Source.h"
 #include "Detector.h"
+#include "Collimator.h"
 #include "Particle.h"
 #include "interaction_data.h"
 
@@ -29,9 +30,10 @@ class Experiment
   
   // Particule Source
   Source * source_;
-  
   // Detector
   Detector * detector_;
+  // Collimator
+  Collimator * collimator_;
 
   // 1st Particle in Stack
   Particle * topOfStack_;
@@ -41,12 +43,12 @@ class Experiment
 
  public:
 
-  void event(int nEvent, int nEvents);
+  double event();
   void add2stack(Particle * particle);
   void removeTopOfStack();
 
   // constructor and destructor
-  Experiment(gsl_rng * rng, double sourceEnergy, double sourceSigma);
+  Experiment(gsl_rng * rng, sourceParameters sParam, detectorParameters dParam, collimatorParameters cParam);
   ~Experiment();
   
   // getters

@@ -9,6 +9,9 @@ using namespace std;
 #include "random.h"
 #include "interaction_data.h"
 
+#include "Detector.h"
+#include "Collimator.h"
+
 /* PARTICLE CLASS DEFINITION */
 
 /* Particle Types */
@@ -38,35 +41,38 @@ class Particle
   gsl_rng * rng_;
   // Energy
   double energy_;
-  // Position
-  double position_[3]; 
-  // Direction
-  double theta_, phi_; 
 
-  // Previous and next particle in the stack
+  // Position
+  double position_[2]; 
+  // Direction
+  double theta_;
+
+  // Next particle in the stack
   Particle * next_;   
 
   // Private functions
   int selectInteractionType(double *** data);
   void Compton(interactionResult * result);
   void PhotoElectric(int atom, interactionResult * result);
+  void PairProduction(interactionResult * result);
+
   
  protected:
   
   
  public:
   
-  double Propagation(double lambda);
+  double Propagation(Collimator * collimator, Detector * detector, double *** data);
   interactionResult Interaction(double *** data);  
 
   // constructor and destructor
   Particle(gsl_rng * rng, double energy);
+  Particle(gsl_rng * rng, double energy, double theta, double * position);
   ~Particle();
   
   // getters
   double getX(){return position_[0];};
   double getY(){return position_[1];};
-  double getZ(){return position_[2];};
   Particle * getNext(){return next_;};
   double getEnergy(){return energy_;};
 

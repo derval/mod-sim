@@ -31,7 +31,7 @@ double Particle::Propagation(Collimator * collimator, Detector * detector, doubl
   }
   // else if particle is in detector but gets out
   else if (detector->isIn(position_[0],position_[1])) {
-    //cerr << "doesnt interact in detector" << endl;
+    cerr << "doesnt interact in detector" << endl;
     return 0;
   }
   // else if particle is not in the detector
@@ -249,7 +249,6 @@ void Particle::PhotoElectric(int atom, interactionResult * result)
 void Particle::AugerFluo(int atom, interactionResult * result, const double * Shells, double probaAuger, int emptyShell)
 {
   double random = uniform_rand(0,1,rng_);
-  
   if(Shells[emptyShell] == 0)
     return;
 

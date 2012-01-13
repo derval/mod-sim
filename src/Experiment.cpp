@@ -38,9 +38,6 @@ double Experiment::event()
 	for (int i=0; i < result.nParticlesCreated; i++)
 	  add2stack((Particle*)result.particlesCreated[i]);
       }
-      else {
-	cerr << "-- DEBUG -- The particle got out the experiment !" << endl;
-      }
       
       delete current;
       current = 0;

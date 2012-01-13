@@ -50,6 +50,7 @@ class Detector
   double getX(){return position_[0];};
   double getY(){return position_[1];};
   double getDiameter() {return diameter_;};
+  double getWidth() {return width_;};
 
   // setters
 

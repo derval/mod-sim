@@ -48,7 +48,9 @@ double Experiment::event()
 
   cerr << "-- DEBUG -- Scintillation energy : " << scintillationEnergy << endl;
   cerr << "-- DEBUG -- Collected charge : " << detector_->photomultiplication(detector_->scintillation(scintillationEnergy)) << endl << endl;
-  return scintillationEnergy;
+
+  double Fano = 0.18;
+  return gaussian_rand(scintillationEnergy,sqrt(scintillationEnergy)*Fano,rng_);
 }
 
 void Experiment::add2stack(Particle * particle)

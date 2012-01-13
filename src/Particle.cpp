@@ -31,12 +31,15 @@ double Particle::Propagation(Collimator * collimator, Detector * detector, doubl
   }
   // else if particle is in detector but gets out
   else if (detector->isIn(position_[0],position_[1])) {
+    //cerr << "doesnt interact in detector" << endl;
     return 0;
   }
   // else if particle is not in the detector
   else {
-    if(cos(theta_) == 0)
+    if(cos(theta_) == 0) {
+      //cerr << "goes vertically" << endl;
       return 0;
+    }
     
     double yIntersec = 0;
     
@@ -48,24 +51,25 @@ double Particle::Propagation(Collimator * collimator, Detector * detector, doubl
       if((cos(theta_) < 0) || ((yIntersec < (collimator->getY() - (collimator->getDiameter())/2)) 
 			       || (yIntersec > (collimator->getY() + (collimator->getDiameter())/2)))) 
 	{
+	  //cerr << "doesnt get through collimator" << endl;
 	  return 0;
 	}
     }
     
     // if particle is after collimator or it got through collimator
-    else {
-      yIntersec = position_[1] + (detector->getX() - position_[0])*tan(theta_);
-      // if particle doesn't reach the detector
-      if((cos(theta_) < 0) || ((yIntersec < (detector->getY() - (detector->getDiameter())/2)) 
-			       || (yIntersec > (detector->getY() + (detector->getDiameter())/2)))) 
-	{
-	  return 0;
-	}
-      // finally, if particle reaches detector !
-      position_[0] = detector->getX();
-      position_[1] = yIntersec;
-      return 1;
-    }
+    yIntersec = position_[1] + (detector->getX() -detector->getWidth()/2 - position_[0])*tan(theta_);
+    // if particle doesn't reach the detector
+    if((cos(theta_) < 0) || ((yIntersec < (detector->getY() - (detector->getDiameter())/2)) 
+			     || (yIntersec > (detector->getY() + (detector->getDiameter())/2)))) 
+      {
+	//cerr << "doesnt reach detector" << endl;
+	return 0;
+      }
+    // finally, if particle reaches detector !
+    position_[0] = detector->getX();
+    position_[1] = yIntersec;
+    return 1;
+    
   }
 }
 
@@ -210,17 +214,20 @@ void Particle::PairProduction(interactionResult * result)
 void Particle::PhotoElectric(int atom, interactionResult * result)
 {
   const double * Shells = 0;
+  double probaAuger = 0;
   
   if (atom == 0){
     Shells = Na_Shells;
+    probaAuger = Na_Auger;
   }
   else if (atom == 1){
     Shells = I_Shells;
+    probaAuger = I_Auger;
   }
   
   // Determination of the energy of the photoelectron
   int i=-1;
-  double random;
+  double random = 0;
   double electronEnergy = 0;
   while(electronEnergy == 0)
     {
@@ -229,55 +236,122 @@ void Particle::PhotoElectric(int atom, interactionResult * result)
       
       if (Shells[i] == 0)
 	electronEnergy = energy_;
-      else if (energy_ > Shells[i] && random < 0.9)
+      else if (energy_ >= Shells[i] && random < 0.9)
 	electronEnergy = energy_ - Shells[i];
     }
 
   result->depositedEnergy = electronEnergy;
 
-  // Auger / Fluo
-  random = uniform_rand(0,1,rng_);
-  
-  if(random < I_Auger)
-    {
-      // AUGER
-      cerr << "-- DEBUG -- Auger" << endl;
-      
-    }
-  
-  else
-    {
-      // FLUO
-      cerr << "-- DEBUG -- Fluo " ;
-      
-      // K alpha
-      if ( i == 0 ) {
-	cerr << " (K alpha) " << endl;
-	random = uniform_rand(0,1,rng_);
-	double hnuFluo;
-	if (random <= 0.5)
-	  hnuFluo = I_Shells[0] - I_Shells[2]; // K alpha 1
-	else
-	  hnuFluo = I_Shells[0] - I_Shells[3]; // K alpha 2
-	
-	
-	double theta=uniform_rand(0,1,rng_)*M_PI;
-	
-	result->nParticlesCreated = 1;
-	result->particlesCreated = new void * [result->nParticlesCreated];
-	result->particlesCreated[0] = new Particle(rng_,hnuFluo,theta,position_);
-      }
-      
-      // not K
-      else
-	cerr << endl << "Ignoring fluorescence process (layer with a vacancy =/= K)" << endl;
-      
-    }
+  AugerFluo(atom,result,Shells,probaAuger,i);
   
 }
 
+void Particle::AugerFluo(int atom, interactionResult * result, const double * Shells, double probaAuger, int emptyShell)
+{
+  double random = uniform_rand(0,1,rng_);
+  
+  if(Shells[emptyShell] == 0)
+    return;
+
+  // SODIUM
+  if(atom == 0) {
+      }
 
 
+  // IODINE
+  if(atom == 1) {
+    if(random < probaAuger)
+      {
+	// AUGER
+	cerr << "-- DEBUG -- Auger" << endl;
+	
+	if ( emptyShell == 0 ) {
+	  random = uniform_rand(0.01,3,rng_);
+	  int shell = ceil(random);
+	  result->depositedEnergy += Shells[0] - 2*Shells[shell];
+	  AugerFluo(atom,result,Shells,probaAuger,shell);
+	  AugerFluo(atom,result,Shells,probaAuger,shell);
+	}
+	
+	else if( (emptyShell == 1) || (emptyShell == 2) || (emptyShell == 3)) {
+	  result->depositedEnergy += Shells[emptyShell] - 2*Shells[4];
+	  AugerFluo(atom,result,Shells,probaAuger,4);
+	  AugerFluo(atom,result,Shells,probaAuger,4);
+	}
+	
+	else if( emptyShell == 4 ) {
+	  result->depositedEnergy += Shells[4];
+	}
+	
+      }
+    
+    else
+      {
+	// FLUO
+	cerr << "-- DEBUG -- Fluo " ;
+	
+	// K layer
+	if ( emptyShell == 0 ) {
+	  cerr << " (K alpha) " << endl;
+	  random = uniform_rand(0,1,rng_);
+	  double hnuFluo;
+	  if (random <= 0.5)
+	    hnuFluo = I_Shells[0] - I_Shells[2]; // K alpha 1
+	  else
+	    hnuFluo = I_Shells[0] - I_Shells[3]; // K alpha 2
+	  
+	  
+	  double theta=uniform_rand(0,1,rng_)*2*M_PI;
+	  
+	  result->nParticlesCreated += 1;
+	  void ** save = new void * [result->nParticlesCreated];
+	  for(int i = 0; i < result->nParticlesCreated - 1; i++)
+	    save[i] = result->particlesCreated[i];
+	  delete result->particlesCreated;
+	  result->particlesCreated = save;
+	  result->particlesCreated[result->nParticlesCreated-1] = new Particle(rng_,hnuFluo,theta,position_);
+	  
+	}
+	
+	// L layer
+	else if( (emptyShell == 1) || (emptyShell == 2) || (emptyShell == 3)) {
+	  cerr << " (L alpha) " << endl;
+	  double hnuFluo;
+	  hnuFluo = I_Shells[emptyShell] - I_Shells[4]; // L alpha
+	  
+	  double theta=uniform_rand(0,1,rng_)*2*M_PI;
+	  
+	  result->nParticlesCreated += 1;
+	  void ** save = new void * [result->nParticlesCreated];
+	  for(int i = 0; i < result->nParticlesCreated - 1; i++)
+	    save[i] = result->particlesCreated[i];
+	  delete result->particlesCreated;
+	  result->particlesCreated = save;
+	  result->particlesCreated[result->nParticlesCreated-1] = new Particle(rng_,hnuFluo,theta,position_);
+	}
+
+	// M layer
+	else if(emptyShell == 4) {
+	  cerr << " (M alpha) " << endl;
+	  double hnuFluo;
+	  hnuFluo = I_Shells[emptyShell]; // M alpha
+	    
+	  double theta=uniform_rand(0,1,rng_)*2*M_PI;
+	  
+	  result->nParticlesCreated += 1;
+	  void ** save = new void * [result->nParticlesCreated];
+	  for(int i = 0; i < result->nParticlesCreated - 1; i++)
+	    save[i] = result->particlesCreated[i];
+	  delete result->particlesCreated;
+	  result->particlesCreated = save;
+	  result->particlesCreated[result->nParticlesCreated-1] = new Particle(rng_,hnuFluo,theta,position_);
+	}
+      }
+  }
+}
+
+  
+  
 // constructor and destructor
 
 Particle::Particle(gsl_rng * rng, double energy): rng_(rng), energy_(energy)

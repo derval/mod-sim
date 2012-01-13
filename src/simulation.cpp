@@ -39,21 +39,21 @@ int main(int argc, char * argv[])
   //
   // Source Parameters
   sourceParameters sParam;
-  sParam.position[0] = 0; // m
+  sParam.position[0] = 0; //
   sParam.position[1] = 0; // m
   sParam.energy = 49.5; // keV
-  sParam.sigma = 2; // keV
+  sParam.sigma = 0; // keV
   // Detector Parameters
   detectorParameters dParam;
-  dParam.position[0] = 0.027; // m
+  dParam.position[0] = 0.05; // m
   dParam.position[1] = 0; // m
-  dParam.diameter = 0.1; // m
+  dParam.diameter = 0.05; // m
   dParam.width = 0.05; // m
   // Collimator Parameters
   collimatorParameters cParam;
-  cParam.position[0] = 0.001; // m
+  cParam.position[0] = 0.01; // m
   cParam.position[1] = 0; // m
-  cParam.diameter = 0.1; // m
+  cParam.diameter = 0.05; // m
   
   if(cParam.position[0] >= (dParam.position[0] - dParam.width/2)) {
     cerr << "-- ERROR -- Collimator must be placed before detector on x axis. Please change parameters." << endl;

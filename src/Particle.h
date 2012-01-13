@@ -55,6 +55,7 @@ class Particle
   void Compton(interactionResult * result);
   void PhotoElectric(int atom, interactionResult * result);
   void PairProduction(interactionResult * result);
+  void AugerFluo(int atom, interactionResult * result, const double * Shells, double probaAuger, int emptyShell);
 
   
  protected:

@@ -21,7 +21,11 @@ double Experiment::event()
   cerr << "-- INFO -- New Event" << endl;
   
   double scintillationEnergy = 0;
-  add2stack(source_ -> emitParticle()); // Source emits a particle that is added to the stack
+  
+  sourceEmission emission =  source_ -> emitParticle(22);
+  for(int i=0; i < emission.nParticlesEmitted; i++)
+    add2stack(emission.particlesEmitted[i]);
+    
   
   // Processing the stack
   while (topOfStack_ != 0)

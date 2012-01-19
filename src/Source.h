@@ -14,6 +14,10 @@ typedef struct {
   double sigma;
 } sourceParameters;
 
+typedef struct {
+  int nParticlesEmitted;
+  Particle ** particlesEmitted;
+} sourceEmission;
 
 /* SOURCE CLASS DEFINITION */
 
@@ -31,7 +35,7 @@ class Source
 
  public:
 
-  Particle * emitParticle();
+  sourceEmission emitParticle(int sourceType);
 
   // constructor and destructor
   Source(gsl_rng * rng, sourceParameters sParam
